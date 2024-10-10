@@ -1,2 +1,2 @@
 # AgentSquare_website
-website for AgentSquare
+webpage for AgentSquare
