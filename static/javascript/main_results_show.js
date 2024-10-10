@@ -6,8 +6,8 @@ let taskScores_save = null;
 let currentTask = 'Avg';
 const sortby_options = {
     BY_REWARD_SCORE: "sort-by-reward-score",
-    BY_SUCCESS_RATE: "sort-by-success-rate",
-    BY_GROUNDING_ACC: "sort-by-grounding-acc",
+    // BY_SUCCESS_RATE: "sort-by-success-rate",
+    // BY_GROUNDING_ACC: "sort-by-grounding-acc",
 };
 let cur_sortby_option = sortby_options.BY_REWARD_SCORE;
 
@@ -296,32 +296,32 @@ function createMainResultChart() {
     let datasets = [];
     let yAxisTitle = '';
     const lineGraphCtx = document.getElementById('line-graph').getContext('2d');
-    if (cur_sortby_option === sortby_options.BY_SUCCESS_RATE) {
-        datasets = rawData.map(modelData => {
-            return {
-                label: modelData.model,
-                data: subTaskLabels.map(subtask => modelData.tasks[subtask] ?
-                    parseFloat(modelData.tasks[subtask].accuracy) : null),
-                borderColor: modelColors[modelData.model] || '#4CAF50',
-                fill: false,
-                ...borderStyles[modelData.model]
-            };
-        });
-        yAxisTitle = 'Success Rate (%)';
-    } 
-    // if (cur_sortby_option === sortby_options.BY_REWARD_SCORE) {
+    // if (cur_sortby_option === sortby_options.BY_SUCCESS_RATE) {
     //     datasets = rawData.map(modelData => {
     //         return {
     //             label: modelData.model,
     //             data: subTaskLabels.map(subtask => modelData.tasks[subtask] ?
-    //                 parseFloat(modelData.tasks[subtask].score) : null),
+    //                 parseFloat(modelData.tasks[subtask].accuracy) : null),
     //             borderColor: modelColors[modelData.model] || '#4CAF50',
     //             fill: false,
     //             ...borderStyles[modelData.model]
     //         };
     //     });
-    //     yAxisTitle = 'Progress Rate (%)';
+    //     yAxisTitle = 'Success Rate (%)';
     // } 
+    if (cur_sortby_option === sortby_options.BY_REWARD_SCORE) {
+        datasets = rawData.map(modelData => {
+            return {
+                label: modelData.model,
+                data: subTaskLabels.map(subtask => modelData.tasks[subtask] ?
+                    parseFloat(modelData.tasks[subtask].score) : null),
+                borderColor: modelColors[modelData.model] || '#4CAF50',
+                fill: false,
+                ...borderStyles[modelData.model]
+            };
+        });
+        yAxisTitle = 'Progress Rate (%)';
+    } 
     // else if (cur_sortby_option === sortby_options.BY_GROUNDING_ACC) {
     //     datasets = rawData.map(modelData => {
     //         return {
@@ -475,10 +475,10 @@ function createAnnotations(modelName) {
             return null;
         }
 
-        let content = `${modelData.model} (success rate):\n`;
-        // if (cur_sortby_option === sortby_options.BY_REWARD_SCORE) {
-        //     content = `${modelData.model} (progress rate):\n`
-        // } 
+        // let content = `${modelData.model} (success rate):\n`;
+        if (cur_sortby_option === sortby_options.BY_REWARD_SCORE) {
+            content = `${modelData.model} (progress rate):\n`
+        } 
         // else if (cur_sortby_option === sortby_options.BY_GROUNDING_ACC) {
         //     content = `${modelData.model} (grounding acc):\n`
         // }
@@ -490,11 +490,11 @@ function createAnnotations(modelName) {
             if (modelData.tasks && modelData.tasks[subtask] && cur_sortby_option === sortby_options.BY_SUCCESS_RATE) {
                 focus_score = parseFloat(modelData.tasks[subtask].accuracy);
             } 
-            // else if (modelData.tasks && modelData.tasks[subtask] && cur_sortby_option === sortby_options.BY_REWARD_SCORE) {
-            //     focus_score = parseFloat(modelData.tasks[subtask].score);
-            // } else if (modelData.tasks && modelData.tasks[subtask] && cur_sortby_option === sortby_options.BY_GROUNDING_ACC) {
-            //     focus_score = parseFloat(modelData.tasks[subtask].grounding);
-            // }
+            else if (modelData.tasks && modelData.tasks[subtask] && cur_sortby_option === sortby_options.BY_REWARD_SCORE) {
+                focus_score = parseFloat(modelData.tasks[subtask].score);
+            } else if (modelData.tasks && modelData.tasks[subtask] && cur_sortby_option === sortby_options.BY_GROUNDING_ACC) {
+                focus_score = parseFloat(modelData.tasks[subtask].grounding);
+            }
             minYValue = Math.min(minYValue, focus_score);
             maxYValue = Math.max(maxYValue, focus_score);
             if (maxYValue === 0) {
